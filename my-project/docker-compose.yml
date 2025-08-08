@@ -1,0 +1,67 @@
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - project-net
+
+  app1:
+    build: .
+    container_name: app-1
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      APP_NAME: app-1
+    ports:
+      - "8001:8000"
+
+    networks:
+      - project-net
+
+    # volumes:
+    #   - ./:/app
+    
+    # command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  app2:
+    build: .
+    container_name: app-2
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      APP_NAME: app-2
+    ports:
+      - "8002:8000"
+
+    networks:
+      - project-net
+
+  nginx:
+    image: nginx:stable
+    container_name: nginx
+    depends_on:
+      - app1
+      - app2
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - project-net
+
+volumes:
+  postgres_data:
+
+networks:
+  project-net:
+    driver: bridge
