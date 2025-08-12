@@ -18,11 +18,11 @@ class Order(Base):
     price = Column(Float)
     # product = Column(ForeignKey("products.id"), index=True)   
 
-    def __init__(self, user, product, price, status="PENDING"):
-        self.status = status
+    def __init__(self, user, price=0, status="PENDING"):
         self.user = user
         self.price = price
-        self.product = product
+        self.status = status
+        # self.product = product
 
 
 class Product(Base):
