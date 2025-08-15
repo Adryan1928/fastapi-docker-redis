@@ -21,3 +21,8 @@ from orders.routes import router as orders_router
 # Adicionando as rotas dos arquivos (parecido com o include do Django)
 app.include_router(auth_router)
 app.include_router(orders_router)
+
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to the FastAPI application"}

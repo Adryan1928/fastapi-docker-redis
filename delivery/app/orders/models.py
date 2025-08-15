@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Float
+from sqlalchemy.orm import relationship
 from database import Base
 
 
@@ -16,13 +17,16 @@ class Order(Base):
     status = Column(String, default="PENDING")
     user = Column(ForeignKey("users.id"))
     price = Column(Float)
-    # product = Column(ForeignKey("products.id"), index=True)   
+    products = relationship("Product", cascade="all, delete")
 
     def __init__(self, user, price=0, status="PENDING"):
         self.user = user
         self.price = price
         self.status = status
         # self.product = product
+    
+    def calc_price(self):
+        self.price = sum(product.price * product.quantity for product in self.products)
 
 
 class Product(Base):
